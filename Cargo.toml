@@ -1,0 +1,28 @@
+[package]
+name = "cwf"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = [ "derive" ] }
+rouille = "3.5.0"
+kuchiki = "0.8.1"
+
+swc = "0.179.1"
+swc_ecma_parser = "0.104.0"
+swc_ecma_codegen = "0.107.0"
+swc_atoms = {version = "0.2"}
+swc_common = { version = "0.18.0"}
+swc_ecma_ast = {version = "0.78.0"}
+swc_ecma_transforms_base = {version = "0.84.0"}
+swc_ecma_transforms_react = {version = "0.113.0"}
+swc_ecma_utils = {version = "0.85.0"}
+swc_ecma_visit = {version = "0.64.0"}
+swc_ecma_transforms_typescript = "0.116.0"
+crossbeam-channel = "0.4.0"
+notify = "5.0.0-pre.15"
+rand = "0.8.5"
+regex = "1.5.5"
