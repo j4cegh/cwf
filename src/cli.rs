@@ -3,11 +3,12 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::io::{Read, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::{mpsc, Arc};
 use std::thread::sleep;
 use std::time::Duration;
 use std::{fs, thread};
+use std::fs::File;
 
 #[derive(Serialize, Deserialize)]
 struct Project {
@@ -20,7 +21,7 @@ pub fn run_cli(args: &Vec<String>) {
     let args = args[2..].to_vec();
 
     match option.as_str() {
-        "create-project" => create_project(args),
+        "create-project" | "new" => create_project(args),
         "run" => run_project(args),
         _ => {}
     }
@@ -75,7 +76,7 @@ fn run_project(option: Vec<String>) {
     project_file.read_to_string(&mut project_string).unwrap();
 
     let mut index_string = String::new();
-    let mut index_file = fs::File::open(&format!("{}/{}", &dir.display(), "index.html")).unwrap();
+    let mut index_file = fs::File::open(&format!("{}/src/{}", &dir.display(), "index.html")).unwrap();
     index_file.read_to_string(&mut index_string).unwrap();
 
     // convert directory typescript files to javascript
@@ -87,23 +88,27 @@ fn run_project(option: Vec<String>) {
 }
 
 fn conv_ts_to_js(ts_file: &str) {
-    let js_code = ts::convert_ts(ts_file);
-    let mut js_file_name = String::new();
-    js_file_name = ts_file.to_string().replace(".ts", ".js");
+    let file = Path::new(ts_file);
+    let file_name = file.file_name().unwrap().to_str().unwrap();
 
-    let dist_dir = "dist";
-    if !PathBuf::from(dist_dir).exists() {
-        fs::create_dir(dist_dir).unwrap();
-    }
+    let file_js = ts::convert_ts(&ts_file.to_string());
 
-    let mut file = fs::File::create(&format!("{}/{}", dist_dir, &js_file_name)).unwrap();
-    file.write_all(js_code.as_bytes()).unwrap();
+    let mut file_js_path = PathBuf::new();
+    file_js_path.push(file.parent().unwrap().parent().unwrap());
+    file_js_path.push("dist");
+    file_js_path.push(file_name);
+    file_js_path.set_extension("js");
+
+    let mut file_js_file = File::create(file_js_path).unwrap();
+    file_js_file.write_all(file_js.as_bytes()).unwrap();
 }
 
 fn conv_dir_ts_to_js(dir: &PathBuf) {
     // load ts files to vec
     let mut ts_files = Vec::new();
-    for entry in fs::read_dir(&dir).unwrap() {
+    let src_dir = dir.join("src");
+
+    for entry in fs::read_dir(&src_dir).unwrap() {
         let entry = entry.unwrap();
         let path = entry.path();
 
@@ -114,11 +119,7 @@ fn conv_dir_ts_to_js(dir: &PathBuf) {
 
     // convert the ts files to js files before run
     for entry in ts_files {
-        let mut ts_string = String::new();
-        let mut ts_file = fs::File::open(&entry).unwrap();
-        ts_file.read_to_string(&mut ts_string).unwrap();
-        let ts_file_name = entry.file_name().unwrap().to_str().unwrap();
-
+        let ts_file_name = entry.to_str().unwrap();
         conv_ts_to_js(ts_file_name);
     }
 }

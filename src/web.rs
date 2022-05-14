@@ -2,7 +2,9 @@ use rouille::Request;
 use rouille::Response;
 use std::fmt::format;
 use std::fs::File;
+use std::io::Read;
 use std::thread;
+use mime_guess;
 
 pub fn start(index: String, port: i32) {
     let start = std::time::Instant::now();
@@ -15,7 +17,10 @@ pub fn start(index: String, port: i32) {
                     let file = File::open(format!("{}/{}", "dist", url.as_str().replace("/", "")));
 
                     match file {
-                        Ok(file) => Response::from_file("application/javascript", file),
+                        Ok(file) => {
+                            let content_type = mime_guess::from_path(format!("{}/{}", "dist", url.as_str().replace("/", ""))).first_or_octet_stream();
+                            return Response::from_file(content_type.to_string(), file);
+                        },
                         Err(_) => Response::text("Not found.").with_status_code(404),
                     }
                 }

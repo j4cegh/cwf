@@ -420,6 +420,7 @@ version = "0.1.0"
 dependencies = [
  "crossbeam-channel 0.4.4",
  "kuchiki",
+ "mime_guess",
  "notify",
  "rand 0.8.5",
  "regex",
