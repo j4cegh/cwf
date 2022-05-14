@@ -8,7 +8,7 @@ use std::sync::{mpsc, Arc};
 use std::thread::sleep;
 use std::time::Duration;
 use std::{fs, thread};
-use std::fs::File;
+use std::fs::{File, read_to_string};
 
 #[derive(Serialize, Deserialize)]
 struct Project {
@@ -49,20 +49,19 @@ fn create_project(option: Vec<String>) {
 
 fn shape_project(project_name: &String) {
     fs::create_dir(format!("{}/src", project_name)).unwrap();
-    fs::File::create(&format!("{}/src/{}", &project_name, "index.ts")).unwrap();
-    fs::File::create(&format!("{}/src/{}", &project_name, "index.html")).unwrap();
-    fs::File::create(&format!("{}/src/{}", &project_name, "index.css")).unwrap();
+    File::create(&format!("{}/src/{}", &project_name, "index.ts")).unwrap();
+    File::create(&format!("{}/src/{}", &project_name, "index.html")).unwrap();
+    File::create(&format!("{}/src/{}", &project_name, "index.css")).unwrap();
 
-    let project = Project {
-        name: project_name.to_string(),
-        port: 3000,
-    };
-    let project_json = serde_json::to_string(&project).unwrap();
+    let project_json = "\
+{
+    \"name\": \"".to_owned() + project_name + "\",
+    \"port\": 3000
+}";
     fs::write(
         &format!("{}/{}", &project_name, "project.json"),
         project_json,
-    )
-    .unwrap();
+    ).unwrap();
 
     println!("Project created.");
 }
@@ -72,16 +71,17 @@ fn run_project(option: Vec<String>) {
 
     let mut project_string = String::new();
     let mut project_file =
-        fs::File::open(&format!("{}/{}", &dir.display(), "project.json")).unwrap();
+        File::open(&format!("{}/{}", &dir.display(), "project.json")).unwrap();
     project_file.read_to_string(&mut project_string).unwrap();
 
     let mut index_string = String::new();
-    let mut index_file = fs::File::open(&format!("{}/src/{}", &dir.display(), "index.html")).unwrap();
+    let mut index_file = File::open(&format!("{}/src/{}", &dir.display(), "index.html")).unwrap();
     index_file.read_to_string(&mut index_string).unwrap();
 
     // convert directory typescript files to javascript
     conv_dir_ts_to_js(&dir);
 
+    dist_css();
     let p: Project = serde_json::from_str(&*project_string).unwrap();
     web::start(index_string, p.port);
     loop {}
@@ -121,5 +121,27 @@ fn conv_dir_ts_to_js(dir: &PathBuf) {
     for entry in ts_files {
         let ts_file_name = entry.to_str().unwrap();
         conv_ts_to_js(ts_file_name);
+    }
+}
+
+fn dist_css() {
+    let dir = env::current_dir().unwrap();
+    let src_dir = dir.join("src");
+    let dist_dir = dir.parent().unwrap().join("dist");
+
+    let mut css_files = Vec::new();
+    for entry in fs::read_dir(&src_dir).unwrap() {
+        let entry = entry.unwrap();
+        let path = entry.path();
+
+        if path.is_file() && path.extension().unwrap() == "css" {
+            css_files.push(path);
+        }
+    }
+
+    for entry in css_files {
+        let mut file = File::create(&format!("{}/dist/{}", dir.to_str().unwrap(), entry.file_name().unwrap().to_str().unwrap())).unwrap();
+        let file_value = read_to_string(entry).unwrap();
+        file.write_all(file_value.as_bytes()).unwrap();
     }
 }
