@@ -17,11 +17,11 @@ pub fn start(port: i32, pageMap : Map<String, Value>) {
             let url = request.url();
             let response = match url.as_str() {
                 "/" => {
-                    let mut file_js_path = PathBuf::new();
-                    file_js_path.push(env::current_dir().unwrap());
-                    file_js_path.push("src");
-                    file_js_path.push(pageMap.get("/").unwrap().as_str().unwrap());
-                    let mut file = File::open(file_js_path).unwrap();
+                    let mut file_html_path = PathBuf::new();
+                    file_html_path.push(env::current_dir().unwrap());
+                    file_html_path.push("src");
+                    file_html_path.push(pageMap.get("/").unwrap().as_str().unwrap());
+                    let mut file = File::open(file_html_path).unwrap();
                     let mut content = String::new();
                     file.read_to_string(&mut content).unwrap();
                     Response::html(content.replace(".ts", ".js"))
@@ -29,11 +29,11 @@ pub fn start(port: i32, pageMap : Map<String, Value>) {
                 _ => {
                     // if it's some other page instead of index
                     if let Some(page) = pageMap.get(url.as_str()) {
-                        let mut file_js_path = PathBuf::new();
-                        file_js_path.push(env::current_dir().unwrap());
-                        file_js_path.push("src");
-                        file_js_path.push(page.as_str().unwrap());
-                        let mut file = File::open(file_js_path).unwrap();
+                        let mut file_html_path = PathBuf::new();
+                        file_html_path.push(env::current_dir().unwrap());
+                        file_html_path.push("src");
+                        file_html_path.push(page.as_str().unwrap());
+                        let mut file = File::open(file_html_path).unwrap();
                         let mut content = String::new();
                         file.read_to_string(&mut content).unwrap();
                         Response::html(content.replace(".ts", ".js"))
