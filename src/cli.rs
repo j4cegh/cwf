@@ -9,11 +9,13 @@ use std::thread::sleep;
 use std::time::Duration;
 use std::{fs, thread};
 use std::fs::{File, read_to_string};
+use serde_json::{Map, Value};
 
 #[derive(Serialize, Deserialize)]
-struct Project {
+pub struct Project {
     name: String,
     port: i32,
+    pageMap: Map<String, Value>,
 }
 
 pub fn run_cli(args: &Vec<String>) {
@@ -56,7 +58,10 @@ fn shape_project(project_name: &String) {
     let project_json = "\
 {
     \"name\": \"".to_owned() + project_name + "\",
-    \"port\": 3000
+    \"port\": 3000,
+    \"pageMap\": {
+        \"/\": \"index.html\"
+    }
 }";
     fs::write(
         &format!("{}/{}", &project_name, "project.json"),
@@ -74,16 +79,15 @@ fn run_project(option: Vec<String>) {
         File::open(&format!("{}/{}", &dir.display(), "project.json")).unwrap();
     project_file.read_to_string(&mut project_string).unwrap();
 
-    let mut index_string = String::new();
-    let mut index_file = File::open(&format!("{}/src/{}", &dir.display(), "index.html")).unwrap();
-    index_file.read_to_string(&mut index_string).unwrap();
+    let p: Project = serde_json::from_str(&*project_string).unwrap();
+
 
     // convert directory typescript files to javascript
     conv_dir_ts_to_js(&dir);
 
     dist_css();
-    let p: Project = serde_json::from_str(&*project_string).unwrap();
-    web::start(index_string, p.port);
+    web::start(p.port, p.pageMap);
+
     loop {}
 }
 
