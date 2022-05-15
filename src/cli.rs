@@ -1,14 +1,8 @@
-use crate::{ts, web};
-use rand::Rng;
+use crate::{css, ts, web};
 use serde::{Deserialize, Serialize};
 use std::env;
-use std::io::{Read, Write};
-use std::path::{Path, PathBuf};
-use std::sync::{mpsc, Arc};
-use std::thread::sleep;
-use std::time::Duration;
-use std::{fs, thread};
-use std::fs::{File, read_to_string};
+use std::io::{Read};
+use std::fs::{self, File};
 use serde_json::{Map, Value};
 
 #[derive(Serialize, Deserialize)]
@@ -83,69 +77,10 @@ fn run_project(option: Vec<String>) {
 
 
     // convert directory typescript files to javascript
-    conv_dir_ts_to_js(&dir);
+    ts::conv_dir_ts_to_js(&dir);
 
-    dist_css();
+    css::dist_css();
     web::start(p.port, p.pageMap);
 
     loop {}
-}
-
-fn conv_ts_to_js(ts_file: &str) {
-    let file = Path::new(ts_file);
-    let file_name = file.file_name().unwrap().to_str().unwrap();
-
-    let file_js = ts::convert_ts(&ts_file.to_string());
-
-    let mut file_js_path = PathBuf::new();
-    file_js_path.push(file.parent().unwrap().parent().unwrap());
-    file_js_path.push("dist");
-    file_js_path.push(file_name);
-    file_js_path.set_extension("js");
-
-    let mut file_js_file = File::create(file_js_path).unwrap();
-    file_js_file.write_all(file_js.as_bytes()).unwrap();
-}
-
-fn conv_dir_ts_to_js(dir: &PathBuf) {
-    // load ts files to vec
-    let mut ts_files = Vec::new();
-    let src_dir = dir.join("src");
-
-    for entry in fs::read_dir(&src_dir).unwrap() {
-        let entry = entry.unwrap();
-        let path = entry.path();
-
-        if path.is_file() && path.extension().unwrap() == "ts" {
-            ts_files.push(path);
-        }
-    }
-
-    // convert the ts files to js files before run
-    for entry in ts_files {
-        let ts_file_name = entry.to_str().unwrap();
-        conv_ts_to_js(ts_file_name);
-    }
-}
-
-fn dist_css() {
-    let dir = env::current_dir().unwrap();
-    let src_dir = dir.join("src");
-    let dist_dir = dir.parent().unwrap().join("dist");
-
-    let mut css_files = Vec::new();
-    for entry in fs::read_dir(&src_dir).unwrap() {
-        let entry = entry.unwrap();
-        let path = entry.path();
-
-        if path.is_file() && path.extension().unwrap() == "css" {
-            css_files.push(path);
-        }
-    }
-
-    for entry in css_files {
-        let mut file = File::create(&format!("{}/dist/{}", dir.to_str().unwrap(), entry.file_name().unwrap().to_str().unwrap())).unwrap();
-        let file_value = read_to_string(entry).unwrap();
-        file.write_all(file_value.as_bytes()).unwrap();
-    }
 }
