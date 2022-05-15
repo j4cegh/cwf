@@ -4,7 +4,7 @@ use std::io::Read;
 use std::thread;
 use mime_guess;
 use serde_json::{Map, Value};
-use crate::{css};
+use crate::{css, html};
 use std::env;
 use std::path::{PathBuf};
 
@@ -22,7 +22,7 @@ pub fn start(port: i32, page_map : Map<String, Value>) {
                     let mut file = File::open(file_html_path).unwrap();
                     let mut content = String::new();
                     file.read_to_string(&mut content).unwrap();
-                    Response::html(content.replace(".ts", ".js"))
+                    Response::html(html::replace_ts(&content))
                 },
                 _ => {
                     // if it's some other page instead of index
@@ -34,7 +34,7 @@ pub fn start(port: i32, page_map : Map<String, Value>) {
                         let mut file = File::open(file_html_path).unwrap();
                         let mut content = String::new();
                         file.read_to_string(&mut content).unwrap();
-                        Response::html(content.replace(".ts", ".js"))
+                        Response::html(html::replace_ts(&content))
                     }
                     // if it's neither of those, try to send a file from dist
                     else {
@@ -45,7 +45,7 @@ pub fn start(port: i32, page_map : Map<String, Value>) {
                                     css::dist_css();
                                 }
                                 let content_type = mime_guess::from_path(format!("dist/{}", url.as_str().replace("/", ""))).first_or_octet_stream();
-                                return Response::from_file(content_type.to_string(), file);
+                                Response::from_file(content_type.to_string(), file)
                             },
                             Err(_) => Response::text("Not found.").with_status_code(404),
                         }
