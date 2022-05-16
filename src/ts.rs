@@ -1,5 +1,6 @@
 use std::{path::Path};
-use std::fs::{File, read_dir};
+use std::fmt::format;
+use std::fs::{create_dir, File, read_dir};
 use std::io::Write;
 use std::path::PathBuf;
 
@@ -68,6 +69,10 @@ pub fn convert_ts(ts_file: &str) -> String {
 }
 
 pub fn conv_ts_to_js(ts_file: &str) {
+    let dir = std::env::current_dir().unwrap();
+    let dir_str = dir.to_str();
+
+    create_dir(format!("{}/dist", dir_str.unwrap()));
     let file = Path::new(ts_file);
     let file_name = file.file_name().unwrap().to_str().unwrap();
 

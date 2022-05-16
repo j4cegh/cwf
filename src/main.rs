@@ -5,6 +5,7 @@ mod html;
 mod ts;
 mod web;
 mod css;
+mod dist;
 
 fn main() {
     let args: Vec<_> = env::args().collect();

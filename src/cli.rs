@@ -1,4 +1,4 @@
-use crate::{css, ts, web};
+use crate::{dist, ts, web};
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::io::{Read};
@@ -50,12 +50,12 @@ fn shape_project(project_name: &String) {
     File::create(&format!("{}/src/{}", &project_name, "index.css")).unwrap();
 
     let project_json = "\
-{
-    \"name\": \"".to_owned() + project_name + "\",
-    \"port\": 3000,
-    \"pageMap\": {
-        \"/\": \"index.html\"
-    }
+    {
+        \"name\": \"".to_owned() + project_name + "\",
+        \"port\": 3000,
+        \"pageMap\": {
+            \"/\": \"index.html\"
+        }
 }";
     fs::write(
         &format!("{}/{}", &project_name, "project.json"),
@@ -75,11 +75,13 @@ fn run_project(option: Vec<String>) {
 
     let p: Project = serde_json::from_str(&*project_string).unwrap();
 
+    // recreate the dist folder so no duplicates happen
+    //dist::recreate(dir.join("dist"));
 
-    // convert directory typescript files to javascript
-    ts::conv_dir_ts_to_js(&dir);
+    // dist all the needed files
+    dist::full_dist(dir);
 
-    css::dist_css();
+    // start the web server
     web::start(p.port, p.pageMap);
 
     loop {}

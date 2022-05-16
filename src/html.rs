@@ -12,6 +12,9 @@ pub fn replace_ts(html: &str) -> String {
                 *src = format!("{x}.js");
             }
         }
+
+        // import it as a module
+        attrs.insert("type", "module".to_string());
     }
 
     doc.to_string()

@@ -3,6 +3,7 @@ use std::fs::{self, File, read_to_string};
 use std::io::Write;
 
 pub fn dist_css() {
+    // TODO: replace w/ walkdir
     let dir = env::current_dir().unwrap();
     let src_dir = dir.join("src");
 
