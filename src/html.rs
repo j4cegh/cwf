@@ -1,3 +1,5 @@
+use std::fs::File;
+use std::io::Read;
 use kuchiki;
 use kuchiki::traits::TendrilSink;
 
@@ -13,9 +15,20 @@ pub fn replace_ts(html: &str) -> String {
             }
         }
 
-        // import it as a module
-        attrs.insert("type", "module".to_string());
+        let name = elem.name.local.to_string();
+
+        if name == "script" {
+            attrs.insert("type", "module".to_string());
+        }
     }
 
     doc.to_string()
+}
+
+pub fn load_page(loc: &str) -> String {
+    println!("Loc: src/{}", loc);
+    let mut file = File::open(format!("src/{}", loc)).unwrap();
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
+    contents
 }

@@ -1,6 +1,6 @@
 use std::{path::Path};
 use std::fmt::format;
-use std::fs::{create_dir, File, read_dir};
+use std::fs::{create_dir, create_dir_all, File, read_dir};
 use std::io::Write;
 use std::path::PathBuf;
 
@@ -68,43 +68,5 @@ pub fn convert_ts(ts_file: &str) -> String {
     })
 }
 
-pub fn conv_ts_to_js(ts_file: &str) {
-    let dir = std::env::current_dir().unwrap();
-    let dir_str = dir.to_str();
 
-    create_dir(format!("{}/dist", dir_str.unwrap()));
-    let file = Path::new(ts_file);
-    let file_name = file.file_name().unwrap().to_str().unwrap();
 
-    let file_js = convert_ts(&ts_file.to_string());
-
-    let mut file_js_path = PathBuf::new();
-    file_js_path.push(file.parent().unwrap().parent().unwrap());
-    file_js_path.push("dist");
-    file_js_path.push(file_name);
-    file_js_path.set_extension("js");
-
-    let mut file_js_file = File::create(file_js_path).unwrap();
-    file_js_file.write_all(file_js.as_bytes()).unwrap();
-}
-
-pub fn conv_dir_ts_to_js(dir: &PathBuf) {
-    // load ts files to vec
-    let mut ts_files = Vec::new();
-    let src_dir = dir.join("src");
-
-    for entry in read_dir(&src_dir).unwrap() {
-        let entry = entry.unwrap();
-        let path = entry.path();
-
-        if path.is_file() && path.extension().unwrap() == "ts" {
-            ts_files.push(path);
-        }
-    }
-
-    // convert the ts files to js files before run
-    for entry in ts_files {
-        let ts_file_name = entry.to_str().unwrap();
-        conv_ts_to_js(ts_file_name);
-    }
-}

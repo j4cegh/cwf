@@ -75,11 +75,11 @@ fn run_project(option: Vec<String>) {
 
     let p: Project = serde_json::from_str(&*project_string).unwrap();
 
-    // recreate the dist folder so no duplicates happen
-    //dist::recreate(dir.join("dist"));
+    // recreate the dist folder so no issues happen
+    dist::recreate(dir.join("dist"));
 
     // dist all the needed files
-    dist::full_dist(dir);
+    dist::dist(dir);
 
     // start the web server
     web::start(p.port, p.pageMap);
