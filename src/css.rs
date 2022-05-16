@@ -18,7 +18,7 @@ pub fn dist_css() {
         }
 
         if path.is_dir() {
-            let f_path_dist = format!("{}/dist/{}", dir.to_str().unwrap(), file_name);
+            let f_path_dist = format!(r"{}\dist\{}", dir.to_str().unwrap(), file_name);
             println!("Log[NF]: {}", f_path_dist);
             if !Path::new(&f_path_dist).exists() {
                 create_dir_all(&f_path_dist).unwrap();
@@ -26,7 +26,7 @@ pub fn dist_css() {
         }
         else if path.is_file() {
             let file_path = path.to_str().unwrap().split("src").collect::<Vec<&str>>()[1];
-            let f_path_dist = format!("{}/dist/{}", dir.to_str().unwrap(), file_path);
+            let f_path_dist = format!(r"{}\dist\{}", dir.to_str().unwrap(), file_path);
 
             if file_name.ends_with(".css") {
                 File::create(Path::new(&f_path_dist)).expect("Couldn't create dist file.");
