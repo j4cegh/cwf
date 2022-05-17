@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::io::Read;
-use kuchiki;
 use kuchiki::{ElementData, NodeDataRef};
 use kuchiki::traits::TendrilSink;
 
