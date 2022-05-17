@@ -44,12 +44,13 @@ fn create_project(option: Vec<String>) {
 }
 
 fn shape_project(project_name: &String) {
-    fs::create_dir(format!("{}/src", project_name)).unwrap();
-    fs::create_dir(format!("{}/dist", project_name)).unwrap();
+    fs::create_dir(format!(r"{}\src", project_name)).unwrap();
+    fs::create_dir(format!(r"{}\dist", project_name)).unwrap();
+    fs::create_dir(format!(r"{}\public", project_name)).unwrap();
 
-    File::create(&format!("{}/src/{}", &project_name, "index.ts")).unwrap();
-    File::create(&format!("{}/src/{}", &project_name, "index.html")).unwrap();
-    File::create(&format!("{}/src/{}", &project_name, "index.css")).unwrap();
+    File::create(&format!(r"{}\src\{}", &project_name, "index.ts")).unwrap();
+    File::create(&format!(r"{}\src\{}", &project_name, "index.html")).unwrap();
+    File::create(&format!(r"{}\src\{}", &project_name, "index.css")).unwrap();
 
     let project_json = "\
 {
@@ -60,7 +61,7 @@ fn shape_project(project_name: &String) {
    }
 }";
     fs::write(
-        &format!("{}/{}", &project_name, "project.json"),
+        &format!(r"{}\{}", &project_name, "project.json"),
         project_json,
     ).unwrap();
 
@@ -72,7 +73,7 @@ fn run_project(option: Vec<String>) {
 
     let mut project_string = String::new();
     let mut project_file =
-        File::open(&format!("{}/{}", &dir.display(), "project.json")).unwrap();
+        File::open(&format!(r"{}\{}", &dir.display(), "project.json")).unwrap();
     project_file.read_to_string(&mut project_string).unwrap();
 
     let p: Project = serde_json::from_str(&*project_string).unwrap();

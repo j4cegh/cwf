@@ -10,7 +10,6 @@ serde_json = "1.0"
 serde = "1.0.137"
 rouille = "3.5.0"
 kuchiki = "0.8.1"
-
 swc = "0.179.1"
 swc_ecma_parser = "0.104.0"
 swc_ecma_codegen = "0.107.0"
