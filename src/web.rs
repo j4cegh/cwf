@@ -23,8 +23,9 @@ pub fn start(port: i32, page_map : Map<String, Value>) {
                         // load the html file from the provided path
                         println!("Loading page: {}", page);
                         let page = html::load_page(page);
+                        let page_js = html::replace_ts(&page);
 
-                        Response::html(html::replace_ts(&page))
+                        Response::html(page_js)
                     }
                     // if it's not, try to send a file from dist
                     else {
@@ -37,6 +38,7 @@ pub fn start(port: i32, page_map : Map<String, Value>) {
                                 let content_type = mime_guess::from_path(format!("dist/{}", url.as_str().replace("/", ""))).first_or_octet_stream();
                                 Response::from_file(content_type.to_string(), file)
                             },
+                            // if it's not in dist, it's not found within the searched scope.
                             Err(_) => Response::text("Not found.").with_status_code(404),
                         }
                     }

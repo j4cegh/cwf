@@ -26,7 +26,7 @@ pub fn replace_ts(html: &str) -> String {
 }
 
 pub fn load_page(loc: &str) -> String {
-    println!("Loc: src/{}", loc);
+    println!("Location: src/{}", loc);
     let mut file = File::open(format!("src/{}", loc)).unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
