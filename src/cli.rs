@@ -45,17 +45,19 @@ fn create_project(option: Vec<String>) {
 
 fn shape_project(project_name: &String) {
     fs::create_dir(format!("{}/src", project_name)).unwrap();
+    fs::create_dir(format!("{}/dist", project_name)).unwrap();
+
     File::create(&format!("{}/src/{}", &project_name, "index.ts")).unwrap();
     File::create(&format!("{}/src/{}", &project_name, "index.html")).unwrap();
     File::create(&format!("{}/src/{}", &project_name, "index.css")).unwrap();
 
     let project_json = "\
-    {
-        \"name\": \"".to_owned() + project_name + "\",
-        \"port\": 3000,
-        \"pageMap\": {
-            \"/\": \"index.html\"
-        }
+{
+   \"name\": \"".to_owned() + project_name + "\",
+   \"port\": 3000,
+   \"pageMap\": {
+       \"/\": \"index.html\"
+   }
 }";
     fs::write(
         &format!("{}/{}", &project_name, "project.json"),
