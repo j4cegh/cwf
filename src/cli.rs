@@ -1,4 +1,4 @@
-use crate::{dist, ts, web};
+use crate::{dist, web};
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::io::{Read};
@@ -6,10 +6,11 @@ use std::fs::{self, File};
 use serde_json::{Map, Value};
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Project {
     name: String,
     port: i32,
-    pageMap: Map<String, Value>,
+    page_map: Map<String, Value>,
 }
 
 pub fn run_cli(args: &Vec<String>) {
@@ -68,7 +69,7 @@ fn shape_project(project_name: &String) {
     println!("Project created.");
 }
 
-fn run_project(option: Vec<String>) {
+fn run_project(_option: Vec<String>) {
     let dir = env::current_dir().unwrap();
 
     let mut project_string = String::new();
@@ -85,7 +86,7 @@ fn run_project(option: Vec<String>) {
     dist::dist(dir);
 
     // start the web server
-    web::start(p.port, p.pageMap);
+    web::start(p.port, p.page_map);
 
     loop {}
 }

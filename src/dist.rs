@@ -2,7 +2,7 @@ use std::fs::{create_dir, create_dir_all, File, remove_dir_all};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
-use crate::{ts, css};
+use crate::ts;
 
 pub fn change_ext(old_filename: &str, new_ext: &str) -> String {
     let mut new_filename = old_filename.to_string();

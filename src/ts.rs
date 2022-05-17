@@ -1,8 +1,4 @@
 use std::{path::Path};
-use std::fmt::format;
-use std::fs::{create_dir, create_dir_all, File, read_dir};
-use std::io::Write;
-use std::path::PathBuf;
 
 // swc
 use swc_common::{
