@@ -19,9 +19,9 @@ fn get_public(url: String) -> Response {
     let file_name = get_file_name(&url);
 
     let mut path_vec = url.split("/static").collect::<Vec<&str>>();
-    let path_vec = path_vec.pop().unwrap();
+    let path = path_vec.pop().unwrap();
 
-    let file = File::open(format!(r"public\{}", path_vec));
+    let file = File::open(format!(r"public\{}", path));
 
     let response = match file {
         Ok(file) => {
