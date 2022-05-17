@@ -17,6 +17,7 @@ fn do_replace(elem: NodeDataRef<ElementData>) {
         attrs.insert("type", "module".to_string());
     }
 }
+
 pub fn replace_ts(html: &str) -> String {
     let doc = kuchiki::parse_html().one(html);
     let head = doc.select_first("head").unwrap();
