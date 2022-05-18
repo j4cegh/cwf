@@ -18,7 +18,7 @@ pub fn dist_css() {
 
         if path.is_file() {
             let file_path = path.to_str().unwrap().split("src").collect::<Vec<&str>>()[1];
-            let f_path_dist = format!(r"{}\dist\{}", dir.to_str().unwrap(), file_path);
+            let f_path_dist = format!(r"{}/dist/{}", dir.to_str().unwrap(), file_path);
             let path_without_file = f_path_dist.split(file_name).collect::<Vec<&str>>()[0];
 
             if file_name.ends_with(".css") {

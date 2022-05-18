@@ -18,11 +18,11 @@ fn get_public(url: String) -> Response {
     let mut path_vec = url.split("/static").collect::<Vec<&str>>();
     let path = path_vec.pop().unwrap();
 
-    let file = File::open(format!(r"public\{}", path));
+    let file = File::open(format!(r"public/{}", path));
 
     let response = match file {
         Ok(file) => {
-            let content_type = mime_guess::from_path(format!(r"public\{}", file_name)).first_or_octet_stream();
+            let content_type = mime_guess::from_path(format!(r"public/{}", file_name)).first_or_octet_stream();
             Response::from_file(content_type.to_string(), file)
         }
         Err(_) => {

@@ -35,7 +35,7 @@ pub fn dist(dir: PathBuf) {
             }
 
             let file_path = path.to_str().unwrap().split("src").collect::<Vec<&str>>()[1];
-            let f_path_dist = format!(r"{}\dist\{}", dir.to_str().unwrap(), file_path);
+            let f_path_dist = format!(r"{}/dist/{}", dir.to_str().unwrap(), file_path);
             let path_without_file = f_path_dist.split(file_name).collect::<Vec<&str>>()[0];
 
             if !Path::new(&path_without_file).exists() {
