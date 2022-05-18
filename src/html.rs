@@ -11,7 +11,6 @@ fn do_replace(elem: NodeDataRef<ElementData>) {
         if let Some(src) = attrs.get_mut("src") {
             if let Some(x) = src.strip_suffix(".ts") {
                 *src = format!("{}.js", x);
-                attrs.insert("type", "module".to_string());
             }
         }
     }
