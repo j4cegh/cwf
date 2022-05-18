@@ -3,7 +3,7 @@ use std::fs::File;
 use std::thread;
 use mime_guess;
 use serde_json::{Map, Value};
-use crate::{css, html};
+use crate::{css, html, ts};
 
 pub fn get_file_name(full_path: &str) -> String {
     let mut path_vec = full_path.split("/").collect::<Vec<&str>>();
@@ -32,7 +32,7 @@ fn get_public(url: String) -> Response {
     response
 }
 
-pub fn start(port: i32, page_map : Map<String, Value>) {
+pub fn start(is_dev: bool, port: i32, page_map : Map<String, Value>) {
     let start = std::time::Instant::now();
     thread::spawn(move || {
         rouille::start_server(format!("0.0.0.0:{}", port), move |request| {
@@ -60,8 +60,16 @@ pub fn start(port: i32, page_map : Map<String, Value>) {
                         let file = File::open(format!("dist/{}", url.as_str()));
                         match file {
                             Ok(file) => {
-                                if url.as_str().ends_with(".css") {
-                                    css::dist_css();
+                                if is_dev {
+                                    let url_str = url.as_str();
+
+                                    if url_str.ends_with(".css")
+                                    {
+                                        css::dist_css();
+                                    }
+                                    else if url_str.ends_with(".js") {
+                                        ts::dist_ts();
+                                    }
                                 }
                                 let content_type = mime_guess::from_path(format!("dist/{}", get_file_name(&url))).first_or_octet_stream();
                                 Response::from_file(content_type.to_string(), file)
@@ -77,8 +85,8 @@ pub fn start(port: i32, page_map : Map<String, Value>) {
     });
     let duration = start.elapsed().as_micros();
     println!(
-        "🚀 Running on port {}. Took {} microseconds!",
-        port, duration
+        "🚀 Running on port {}{}. Took {} microseconds!",
+        port, (if is_dev {" in dev mode"} else {""}), duration
     );
     drop(start);
 }

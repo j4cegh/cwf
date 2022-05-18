@@ -1,4 +1,7 @@
 use std::{path::Path};
+use std::fs::{create_dir_all, File};
+use std::io::{Read, Write};
+use std::env;
 
 // swc
 use swc_common::{
@@ -9,6 +12,8 @@ use swc_ecma_parser::{lexer::Lexer, Parser, StringInput, Syntax, TsConfig};
 use swc_ecma_transforms_base::{hygiene::hygiene, resolver};
 use swc_ecma_transforms_typescript::strip;
 use swc_ecma_visit::FoldWith;
+use walkdir::WalkDir;
+use crate::dist;
 // ----
 
 pub fn convert_ts(ts_file: &str) -> String {
@@ -64,5 +69,40 @@ pub fn convert_ts(ts_file: &str) -> String {
     })
 }
 
+pub fn dist_ts() {
+    let dir = env::current_dir().unwrap();
 
+    for entry in WalkDir::new(dir.join("src").to_str().unwrap()) {
+        let entry = entry.unwrap();
+        let path = entry.path();
+        let file_name = path.file_name().unwrap().to_str().unwrap();
 
+        if file_name == "src" {
+            continue;
+        }
+
+        if path.is_file() {
+            if !file_name.ends_with(".ts") {
+                continue;
+            }
+
+            let file_path = path.to_str().unwrap().split("src").collect::<Vec<&str>>()[1];
+            let f_path_dist = format!(r"{}/dist/{}", dir.to_str().unwrap(), file_path);
+            let path_without_file = f_path_dist.split(file_name).collect::<Vec<&str>>()[0];
+
+            if !Path::new(&path_without_file).exists() {
+                create_dir_all(&path_without_file).unwrap();
+            }
+            let f_path_dist = dist::change_ext(&f_path_dist, ".js");
+
+            File::create(Path::new(&f_path_dist)).expect("Couldn't create dist file.");
+
+            let mut file = File::open(path).expect("Couldn't open file.");
+            let mut content = String::new();
+            file.read_to_string(&mut content).expect("Couldn't read file.");
+            let content = convert_ts(path.to_str().unwrap());
+            let mut file = File::create(Path::new(&f_path_dist)).expect("Couldn't create dist file.");
+            file.write_all(content.as_bytes()).expect("Couldn't write file.");
+        }
+    }
+}

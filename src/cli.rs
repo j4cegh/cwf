@@ -70,6 +70,12 @@ fn shape_project(project_name: &String) {
 }
 
 fn run_project(_option: Vec<String>) {
+    let dev_option = _option.get(0);
+    let is_dev = match dev_option {
+        Some(option) => option == "--dev",
+        None => false,
+    };
+
     let dir = env::current_dir().unwrap();
 
     let mut project_string = String::new();
@@ -86,7 +92,7 @@ fn run_project(_option: Vec<String>) {
     dist::dist(dir);
 
     // start the web server
-    web::start(p.port, p.page_map);
+    web::start(is_dev, p.port, p.page_map);
 
     loop {}
 }
