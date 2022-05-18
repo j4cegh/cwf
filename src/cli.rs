@@ -19,8 +19,19 @@ pub fn run_cli(args: &Vec<String>) {
 
     match option.as_str() {
         "create-project" | "new" => create_project(args),
-        "run" => run_project(args),
-        _ => {}
+        "run" | "start" => {
+            let dev_option = args.get(0);
+            let is_dev = match dev_option {
+                Some(option) => option == "--dev",
+                None => false,
+            };
+
+            run_project(is_dev)
+        },
+        "dev" => run_project(true),
+        _ => {
+            println!("Unknown option: {}", option);
+        }
     }
 }
 
@@ -69,13 +80,7 @@ fn shape_project(project_name: &String) {
     println!("Project created.");
 }
 
-fn run_project(_option: Vec<String>) {
-    let dev_option = _option.get(0);
-    let is_dev = match dev_option {
-        Some(option) => option == "--dev",
-        None => false,
-    };
-
+fn run_project(is_dev: bool) {
     let dir = env::current_dir().unwrap();
 
     let mut project_string = String::new();
