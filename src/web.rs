@@ -74,8 +74,18 @@ pub fn start(is_dev: bool, port: i32, page_map : Map<String, Value>) {
                                 let content_type = mime_guess::from_path(format!("dist/{}", get_file_name(&url))).first_or_octet_stream();
                                 Response::from_file(content_type.to_string(), file)
                             },
-                            // if it's not from dist, try to send from public.
-                            Err(_) => Response::text("Not found.").with_status_code(404)
+                            Err(_) => {
+                                let file = File::open(format!("dist/{}.js", url.as_str()));
+                                match file {
+                                    Ok(file) => {
+                                        let content_type = mime_guess::from_path(format!("dist/{}.js", get_file_name(&url))).first_or_octet_stream();
+                                        Response::from_file(content_type.to_string(), file)
+                                    },
+                                    Err(_) => {
+                                        Response::text("Not found.").with_status_code(404)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
